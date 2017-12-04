@@ -2,4 +2,5 @@
 # downloaded text files. As such all files in the root directory should be ignored.
 /*
 !.gitignore
+!README.md
 !/*/
