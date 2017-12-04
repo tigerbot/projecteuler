@@ -1,0 +1,5 @@
+# This repo is only intended to track the libraries used, not the main file, built binaries, or
+# downloaded text files. As such all files in the root directory should be ignored.
+/*
+!.gitignore
+!/*/
