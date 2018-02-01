@@ -3,14 +3,19 @@ package primes
 import (
 	"math"
 	"sort"
+	"sync"
 )
 
 var (
 	cachedSieve = []int64{2, 3, 5, 7, 11, 13, 17, 19}
 	cachedRange = int64(20)
+	sieveLock   sync.Mutex
 )
 
 func expandSieve(num int64) {
+	sieveLock.Lock()
+	defer sieveLock.Unlock()
+
 	if num < cachedRange {
 		return
 	}

@@ -39,6 +39,9 @@ func FindCycle(num, den int) []int {
 // SplitDigits returns a list of the digits used to represent the number in decimal notation. The
 // first element in the array represents the highest magnitude.
 func SplitDigits(num, base int64) []int {
+	if num < 0 || base < 0 {
+		panic("Tried to split negative number, overflow suspected")
+	}
 	if num == 0 {
 		return []int{0}
 	}

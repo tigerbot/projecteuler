@@ -6,27 +6,28 @@ import (
 )
 
 // Factor returns a slice of all of the prime factors for the given number.
-func Factor(num int64) []int64 {
-	if num == 1 {
+func Factor(orig int64) []int64 {
+	if orig == 1 {
 		return []int64{1}
 	}
-	if num < 1 {
-		panic(fmt.Errorf("cannot factor non-natural number %d", num))
+	if orig < 1 {
+		panic(fmt.Errorf("cannot factor non-natural number %d", orig))
 	}
+	num := orig
 
 	result := []int64{}
 	loopPrimes := func(list []int64) {
 		for _, prime := range list {
 			if prime > num {
-				panic(fmt.Sprintf("factoring %d reached prime %d, but only %d remaining", num, prime, num))
+				panic(fmt.Sprintf("factoring %d reached prime %d, but only %d remaining", orig, prime, num))
 			}
 			for num%prime == 0 {
 				result = append(result, prime)
 				num /= prime
 			}
 			// We've already removed all of the smaller prime factors, so if the number is bigger
-			// than the square of the current prime no larger primes can be factors
-			if prime*prime > num {
+			// than the square of the current prime no larger primes can be a factor more than once
+			if num != 1 && prime*prime > num {
 				result = append(result, num)
 				num = 1
 			}
@@ -36,8 +37,8 @@ func Factor(num int64) []int64 {
 		}
 	}
 
-	// Pull out all the factors of the primes we've already discovered before determining what the
-	// largest prime factor can be in case we can make that smaller.
+	// Pull out all the factors of the primes we've already discovered before trying to expand the
+	// sieve. This helps limit how big we have to make the sieve when dealing with larger numbers.
 	loopPrimes(cachedSieve)
 	if num == 1 {
 		return result
@@ -156,41 +157,6 @@ func GCD(values ...int64) int64 {
 	result := int64(1)
 	for prime, count := range commonFactors {
 		result *= Pow(prime, count)
-	}
-	return result
-}
-
-func combineFactors(factors []int64, count int) []int64 {
-	if count == 0 || len(factors) < count {
-		return nil
-	}
-	if count == 1 {
-		return factors
-	}
-
-	var result []int64
-	for ind, prime := range factors {
-		subRes := combineFactors(append([]int64(nil), factors[:ind]...), count-1)
-		for i := range subRes {
-			subRes[i] *= prime
-		}
-		result = append(result, subRes...)
-	}
-	return result
-}
-func countDivisbleBy(limit int64, factors []int64) int64 {
-	var result int64
-	for i := 1; i <= len(factors); i++ {
-		var subRes int64
-		for _, num := range combineFactors(factors, i) {
-			subRes += (limit - 1) / num
-		}
-
-		if i%2 == 1 {
-			result += subRes
-		} else {
-			result -= subRes
-		}
 	}
 	return result
 }

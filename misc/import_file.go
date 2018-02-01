@@ -38,6 +38,24 @@ func ReadNumberGrid(name string, sep rune) [][]int64 {
 	return result
 }
 
+// ReadTextGrid reads a grid of arbitrary strings from a file
+func ReadTextGrid(name string, sep rune) [][]string {
+	file, err := os.Open(name)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	reader.Comma = sep
+
+	raw, err := reader.ReadAll()
+	if err != nil {
+		panic(err)
+	}
+	return raw
+}
+
 // ReadFlattenText reads a csv and returns the flattened results
 func ReadFlattenText(name string) []string {
 	file, err := os.Open(name)
