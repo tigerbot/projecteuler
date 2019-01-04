@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ones = map[int64]string{
+	ones = map[int]string{
 		1: "one",
 		2: "two",
 		3: "three",
@@ -18,7 +18,7 @@ var (
 		8: "eight",
 		9: "nine",
 	}
-	tens = map[int64]string{
+	tens = map[int]string{
 		2: "twenty",
 		3: "thirty",
 		4: "forty",
@@ -28,7 +28,7 @@ var (
 		8: "eighty",
 		9: "ninety",
 	}
-	teens = map[int64]string{
+	teens = map[int]string{
 		10: "ten",
 		11: "eleven",
 		12: "twelve",
@@ -40,7 +40,7 @@ var (
 		18: "eighteen",
 		19: "nineteen",
 	}
-	mags = map[int64]string{
+	mags = map[int]string{
 		3:  "thousand",
 		6:  "million",
 		9:  "billion",
@@ -50,7 +50,7 @@ var (
 )
 
 // nameGroup takes a number < 1000 and returns the english name.
-func nameGroup(num int64) string {
+func nameGroup(num int) string {
 	if num > 999 || num < 0 {
 		panic(fmt.Errorf("`nameGroup` cannot create name for %d", num))
 	}
@@ -84,7 +84,7 @@ func nameGroup(num int64) string {
 }
 
 // NameNumber returns the English name for the provided number.
-func NameNumber(num int64) string {
+func NameNumber(num int) string {
 	var result string
 	if num == 0 {
 		return "zero"
@@ -95,8 +95,8 @@ func NameNumber(num int64) string {
 	}
 
 	first := true
-	for mag := 3 * int64(math.Floor(math.Log10(float64(num))/3)); mag >= 0; mag -= 3 {
-		pow := int64(math.Pow10(int(mag)))
+	for mag := 3 * int(math.Floor(math.Log10(float64(num))/3)); mag >= 0; mag -= 3 {
+		pow := int(math.Pow10(int(mag)))
 		if grpName := nameGroup(num / pow); grpName != "" {
 			if !first {
 				result += ", "

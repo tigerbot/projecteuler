@@ -38,7 +38,7 @@ func FindCycle(num, den int) []int {
 
 // SplitDigits returns a list of the digits used to represent the number in decimal notation. The
 // first element in the array represents the highest magnitude.
-func SplitDigits(num, base int64) []int {
+func SplitDigits(num, base int) []int {
 	if num < 0 || base < 0 {
 		panic("Tried to split negative number, overflow suspected")
 	}
@@ -55,10 +55,10 @@ func SplitDigits(num, base int64) []int {
 }
 
 // MergeDigits is the inverse of the SplitDigit function.
-func MergeDigits(digits []int, base int64) int64 {
-	var result int64
+func MergeDigits(digits []int, base int) int {
+	var result int
 	for _, dig := range digits {
-		result = base*result + int64(dig)
+		result = base*result + int(dig)
 	}
 	return result
 }

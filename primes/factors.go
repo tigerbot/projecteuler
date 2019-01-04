@@ -3,20 +3,21 @@ package primes
 import (
 	"fmt"
 	"math"
+	"sort"
 )
 
 // Factor returns a slice of all of the prime factors for the given number.
-func Factor(orig int64) []int64 {
+func Factor(orig int) []int {
 	if orig == 1 {
-		return []int64{1}
+		return []int{1}
 	}
 	if orig < 1 {
 		panic(fmt.Errorf("cannot factor non-natural number %d", orig))
 	}
 	num := orig
 
-	result := []int64{}
-	loopPrimes := func(list []int64) {
+	result := []int{}
+	loopPrimes := func(list []int) {
 		for _, prime := range list {
 			if prime > num {
 				panic(fmt.Sprintf("factoring %d reached prime %d, but only %d remaining", orig, prime, num))
@@ -26,7 +27,7 @@ func Factor(orig int64) []int64 {
 				num /= prime
 			}
 			// We've already removed all of the smaller prime factors, so if the number is bigger
-			// than the square of the current prime no larger primes can be a factor more than once
+			// than the square of the current prime what's left must be a prime.
 			if num != 1 && prime*prime > num {
 				result = append(result, num)
 				num = 1
@@ -46,7 +47,7 @@ func Factor(orig int64) []int64 {
 
 	// Then loop through all of the primes between what we had cached and the square root of the
 	// number we haven't been able to reduce yet.
-	loopPrimes(Between(cachedRange, int64(math.Sqrt(float64(num))+1)))
+	loopPrimes(Between(cachedRange, int(math.Sqrt(float64(num))+1)))
 	if num != 1 {
 		result = append(result, num)
 	}
@@ -57,9 +58,9 @@ func Factor(orig int64) []int64 {
 // FactorMap returns a map of how many times each factor appears in the prime factorization of
 // the given number. For example FactorMap(16) would return {2: 4} and FactorMap(60) would return
 // {2: 2, 3: 1, 5: 1}
-func FactorMap(num int64) map[int64]int64 {
+func FactorMap(num int) map[int]int {
 	factors := Factor(num)
-	result := map[int64]int64{}
+	result := map[int]int{}
 	for _, prime := range factors {
 		result[prime]++
 	}
@@ -68,16 +69,16 @@ func FactorMap(num int64) map[int64]int64 {
 
 // CountDivisors counts the number of unique natural numbers greater than 1 that divide evenly into
 // the given number without a remainder.
-func CountDivisors(num int64) int64 {
-	result := int64(1)
+func CountDivisors(num int) int {
+	result := int(1)
 	for _, cnt := range FactorMap(num) {
 		result *= (cnt + 1)
 	}
 	return result
 }
 
-func multiplySlice(factor int64, slice []int64) []int64 {
-	result := make([]int64, len(slice))
+func multiplySlice(factor int, slice []int) []int {
+	result := make([]int, len(slice))
 	for i := range slice {
 		result[i] = factor * slice[i]
 	}
@@ -87,25 +88,25 @@ func multiplySlice(factor int64, slice []int64) []int64 {
 // Divisors finds all numbers that divide evenly into the provided number. Note that this does
 // require more work than determining how many there are, so only use this function if you need the
 // actual values of the divisors.
-func Divisors(num int64) []int64 {
-	result := []int64{1}
+func Divisors(num int) []int {
+	result := []int{1}
 	for prime, cnt := range FactorMap(num) {
 		prev := result
-		for i, factor := int64(1), prime; i <= cnt; i++ {
+		for i, factor := int(1), prime; i <= cnt; i++ {
 			result = append(result, multiplySlice(factor, prev)...)
 			factor *= prime
 		}
 	}
-	sortInt64(result)
+	sort.Ints(result)
 	return result
 }
 
 // SumDivisors adds all of the numbers less than the provided that divide evenly into it.
-func SumDivisors(num int64) int64 {
+func SumDivisors(num int) int {
 	divs := Divisors(num)
 	divs = divs[:len(divs)-1]
 
-	var sum int64
+	var sum int
 	for _, val := range divs {
 		sum += val
 	}
@@ -113,50 +114,27 @@ func SumDivisors(num int64) int64 {
 }
 
 // EulerPhi calculates the number of positive integers less than n that are relatively prime to n.
-func EulerPhi(num int64) int64 {
-	result := int64(1)
+func EulerPhi(num int) int {
+	result := int(1)
 	for prime, cnt := range FactorMap(num) {
 		result *= (prime - 1) * Pow(prime, cnt-1)
 	}
 	return result
 }
 
-// LCM returns the Least Common Multiple for all of the numbers specified
-func LCM(values ...int64) int64 {
-	allFactors := map[int64]int64{}
-	for _, val := range values {
-		for prime, count := range FactorMap(val) {
-			if allFactors[prime] < count {
-				allFactors[prime] = count
-			}
-		}
-	}
-
-	result := int64(1)
-	for prime, count := range allFactors {
-		result *= Pow(prime, count)
-	}
-	return result
+// LCM returns the Least Common Multiple for the numbers specified
+func LCM(a, b int) int {
+	d := GCD(a, b)
+	return a * b / d
 }
 
-// GCD return the Greatest Common Divisor for all of the numbers specified
-func GCD(values ...int64) int64 {
-	commonFactors := FactorMap(values[0])
-	for _, val := range values {
-		newFactors := FactorMap(val)
-		for prime := range commonFactors {
-			if newFactors[prime] < commonFactors[prime] {
-				commonFactors[prime] = newFactors[prime]
-			}
-			if commonFactors[prime] == 0 {
-				delete(commonFactors, prime)
-			}
-		}
+// GCD return the Greatest Common Divisor for the numbers specified
+func GCD(a, b int) int {
+	if a < b {
+		a, b = b, a
 	}
-
-	result := int64(1)
-	for prime, count := range commonFactors {
-		result *= Pow(prime, count)
+	for b > 0 {
+		a, b = b, a%b
 	}
-	return result
+	return a
 }

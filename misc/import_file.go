@@ -7,7 +7,7 @@ import (
 )
 
 // ReadNumberGrid reads base10 numbers from a file
-func ReadNumberGrid(name string, sep rune) [][]int64 {
+func ReadNumberGrid(name string, sep rune) [][]int {
 	file, err := os.Open(name)
 	if err != nil {
 		panic(err)
@@ -22,11 +22,11 @@ func ReadNumberGrid(name string, sep rune) [][]int64 {
 		panic(err)
 	}
 
-	result := make([][]int64, len(raw))
+	result := make([][]int, len(raw))
 	for i, line := range raw {
-		parsedLine := make([]int64, len(line))
+		parsedLine := make([]int, len(line))
 		for j, rawNum := range line {
-			if num, err := strconv.ParseInt(rawNum, 10, 64); err != nil {
+			if num, err := strconv.Atoi(rawNum); err != nil {
 				panic(err)
 			} else {
 				parsedLine[j] = num
