@@ -3,19 +3,20 @@ package primes
 import (
 	"math"
 	"sort"
-	"sync"
 )
 
 var (
-	cachedSieve = []int{2, 3, 5, 7, 11, 13, 17, 19}
-	cachedRange = int(20)
-	sieveLock   sync.Mutex
+	cachedSieve = []int{2, 3, 5, 7, 11, 13, 17, 19, 23, 29}
+	cachedRange = int(30)
 )
 
-func expandSieve(num int) {
-	sieveLock.Lock()
-	defer sieveLock.Unlock()
+// resetSieve is for testing purposes only.
+func resetSieve() {
+	cachedSieve = []int{2, 3, 5, 7, 11, 13, 17, 19, 23, 29}
+	cachedRange = int(30)
+}
 
+func expandSieve(num int) {
 	if num < cachedRange {
 		return
 	}
@@ -41,7 +42,7 @@ func expandSieve(num int) {
 
 	// First go through our existing primes and remove all multiples of those
 	for _, prime := range cachedSieve {
-		for ind := (cachedRange/prime + 1) * prime; ind <= num; ind += prime {
+		for ind := ((cachedRange-1)/prime + 1) * prime; ind <= num; ind += prime {
 			candidates[ind] = false
 		}
 	}
@@ -108,7 +109,7 @@ func NthPrime(num int) int {
 
 // Between returns a list of all primes in the specified range
 func Between(lower, upper int) []int {
-	if lower >= upper {
+	if lower > upper {
 		return nil
 	}
 	expandSieve(upper)
@@ -119,6 +120,8 @@ func Between(lower, upper int) []int {
 	ind2 := sort.Search(len(cachedSieve), func(i int) bool { return cachedSieve[i] >= upper })
 	if ind2 > len(cachedSieve) {
 		ind2 = len(cachedSieve)
+	} else if ind2 < len(cachedSieve)-1 && cachedSieve[ind2] == upper {
+		ind2++
 	}
 	return append([]int(nil), cachedSieve[ind1:ind2]...)
 }
