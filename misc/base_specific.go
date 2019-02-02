@@ -63,6 +63,8 @@ func MergeDigits(digits []int, base int) int {
 	return result
 }
 
+// IsPandigit checks to see if every digits was used exactly once. It assumes base based on
+// the length of the array, so it would consider 1234 a pandigital number even in base 10.
 func IsPandigit(digits []int) bool {
 	used := make(map[int]bool, len(digits))
 	for _, val := range digits {

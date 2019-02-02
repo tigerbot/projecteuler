@@ -59,6 +59,9 @@ func Factor(orig int) []int {
 // the given number. For example FactorMap(16) would return {2: 4} and FactorMap(60) would return
 // {2: 2, 3: 1, 5: 1}
 func FactorMap(num int) map[int]int {
+	if num == 1 {
+		return nil
+	}
 	factors := Factor(num)
 	result := map[int]int{}
 	for _, prime := range factors {
@@ -67,8 +70,8 @@ func FactorMap(num int) map[int]int {
 	return result
 }
 
-// CountDivisors counts the number of unique natural numbers greater than 1 that divide evenly into
-// the given number without a remainder.
+// CountDivisors counts the number of unique natural numbers >= 1 and that divide evenly into
+// the given number without a remainder (including the given number).
 func CountDivisors(num int) int {
 	result := int(1)
 	for _, cnt := range FactorMap(num) {
@@ -90,6 +93,10 @@ func multiplySlice(factor int, slice []int) []int {
 // actual values of the divisors.
 func Divisors(num int) []int {
 	result := []int{1}
+	if num == 1 {
+		return result
+	}
+
 	for prime, cnt := range FactorMap(num) {
 		prev := result
 		for i, factor := int(1), prime; i <= cnt; i++ {
@@ -99,18 +106,6 @@ func Divisors(num int) []int {
 	}
 	sort.Ints(result)
 	return result
-}
-
-// SumDivisors adds all of the numbers less than the provided that divide evenly into it.
-func SumDivisors(num int) int {
-	divs := Divisors(num)
-	divs = divs[:len(divs)-1]
-
-	var sum int
-	for _, val := range divs {
-		sum += val
-	}
-	return sum
 }
 
 // EulerPhi calculates the number of positive integers less than n that are relatively prime to n.
